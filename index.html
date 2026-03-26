@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>启元 AI - 开启智能的新可能</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    color: #333;
+    overflow-x: hidden;
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    opacity: 0;
+    animation: fadeInPage 0.8s ease forwards;
+}
+
+@keyframes fadeInPage {
+    to { opacity: 1; }
+}
+
+.cursor-light {
+    position: fixed;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(255, 107, 129, 0.12), transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    backdrop-filter: blur(30px);
+    background: rgba(255,255,255,0.45);
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+nav.scrolled {
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+.nav-inner {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+}
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ff6b81;
+}
+.nav-links a {
+    margin-left: 28px;
+    font-size: 15px;
+    color: #444;
+    text-decoration: none;
+    transition: 0.25s ease;
+}
+
+.nav-links a:hover {
+    color: #ff6b81;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 140px 20px 80px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 74px;
+    font-weight: 800;
+    color: #ff6b81;
+    animation: float 5s ease-in-out infinite;
+}
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+.subtitle {
+    font-size: 20px;
+    color: #777;
+    margin-top: 10px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 15px 34px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ff6b81, #ff869a);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin: 0 6px;
+    box-shadow: 0 8px 20px rgba(255, 107, 129, 0.2);
+}
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(255, 107, 129, 0.3);
+}
+.btn.secondary {
+    background: transparent;
+    color: #333;
+    border: 1px solid #ddd;
+    box-shadow: none;
+}
+.btn.secondary:hover {
+    border-color: #ff6b81;
+    color: #ff6b81;
+}
+.hero-buttons {
+    margin-top: 36px;
+}
+
+section {
+    margin-bottom: 110px;
+}
+section h2 {
+    font-size: 36px;
+    margin-bottom: 16px;
+    color: #222;
+}
+section p {
+    color: #777;
+    max-width: 600px;
+    margin: auto;
+    line-height: 1.6;
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1s ease;
+}
+.fade-in.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+</style>
+</head>
+
+<body>
+
+<div class="cursor-light" id="cursor"></div>
+
+<nav>
+    <div class="nav-inner">
+        <div class="logo">启元</div>
+        <div class="nav-links">
+            <a href="#about">关于</a>
+            <a href="#features">功能</a>
+            <a href="#contact">联系</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+<section class="hero fade-in">
+    <h1>启元</h1>
+    <p class="subtitle">开启智能的新可能</p>
+    <div class="hero-buttons">
+        <a href="wensi.html" class="btn">立即体验</a>
+    </div>
+</section>
+
+<section class="fade-in">
+    <h2>不止工具，而是你的智能伙伴</h2>
+    <p>启元将写作、创作、思考与编程融为一体，让 AI 成为你日常的一部分，简单、强大、陪伴。</p>
+</section>
+
+<section id="about" class="fade-in">
+    <h2>关于我们</h2>
+    <p>专注打造极简、高效、温暖的 AI 产品，让每个人都能轻松享受智能带来的美好。</p>
+</section>
+
+<section id="features" class="fade-in">
+    <h2>核心能力</h2>
+    <p>智能对话 · 内容创作 · 编程辅助 · 灵感生成 · 日常陪伴</p>
+</section>
+
+<section id="contact" class="fade-in">
+    <h2>联系我们</h2>
+    <p>期待与你一起探索 AI 的无限可能</p>
+    <p>作者邮箱：dfxaaabc@gmail.com</p>
+</section>
+
+</div>
+
+<script>
+
+
+// 优化后无闪屏的跳转动画
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    const href = this.href;
+    
+    // 只做模糊+变暗，避免缩放导致的闪烁
+    document.body.style.transition = "all 0.2s ease";
+    document.body.style.filter = "blur(8px) brightness(0.9)";
+    
+    setTimeout(()=>{
+      window.location.href = href;
+    }, 400);
+  });
+});
+
+
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+    });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+const cursor = document.getElementById('cursor');
+let mouseX = 0, mouseY = 0, cx = 0, cy = 0;
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+function animate() {
+    cx += (mouseX - cx) * 0.12;
+    cy += (mouseY - cy) * 0.12;
+    cursor.style.left = cx + 'px';
+    cursor.style.top = cy + 'px';
+    requestAnimationFrame(animate);
+}
+animate();
+
+window.addEventListener("scroll", () => {
+    document.querySelector("nav").classList.toggle("scrolled", window.scrollY > 40);
+});
+
+
+// 炫酷跳转动画 —— 直接复制放在 </body> 上面即可
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    const href = this.href;
+    
+    document.body.style.transition = "all 0.5s cubic-bezier(0.65, 0, 0.35, 1)";
+    document.body.style.opacity = "0";
+    document.body.style.filter = "blur(12px) brightness(1.5)";
+    document.body.style.transform = "scale(0.95)";
+    
+    setTimeout(()=>{
+      window.location.href = href;
+    }, 500);
+  });
+});
+
+</script>
+
+</body>
+</html>
