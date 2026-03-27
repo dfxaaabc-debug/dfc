@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>小元 · 智能聊天</title>
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Roboto, Helvetica Neue, Arial, sans-serif}
+:root{
+    --primary: #0071e3;
+    --primary-hover: #0077ed;
+    --primary-light: rgba(0,113,227,0.1);
+    --bg-main: #f5f5f7;
+    --bg-chat: #f5f5f7;
+    --bg-white: #ffffff;
+    --bg-mask: rgba(0,0,0,0.4);
+    --text-main: #1d1d1f;
+    --text-secondary: #86868b;
+    --text-placeholder: #86868b;
+    --border-color: rgba(0,0,0,0.1);
+    --shadow: 0 10px 40px rgba(0,0,0,0.08);
+    --shadow-light: 0 2px 10px rgba(0,0,0,0.05);
+    --code-bg: #1e1e1e;
+    --danger: #ff3b30;
+    --danger-hover: #ff453a;
+}
+[data-theme="dark"]{
+    --primary: #0a84ff;
+    --primary-hover: #1a9fff;
+    --primary-light: rgba(10,132,255,0.12);
+    --bg-main: #000000;
+    --bg-chat: #1c1c1e;
+    --bg-white: #1c1c1e;
+    --bg-mask: rgba(0,0,0,0.7);
+    --text-main: #f5f5f7;
+    --text-secondary: #98989d;
+    --text-placeholder: #98989d;
+    --border-color: rgba(255,255,255,0.12);
+    --shadow: 0 10px 40px rgba(0,0,0,0.4);
+    --shadow-light: 0 2px 10px rgba(0,0,0,0.2);
+    --danger: #ff453a;
+    --danger-hover: #ff3b30;
+}
+
+/* 静态星空背景（无任何呼吸闪烁） */
+#particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: #f5f5f7;
+}
+[data-theme="dark"] #particles {
+  background: #05081a;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 50px 160px, #ddd, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 130px 80px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 160px 120px, #ddd, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+/* 日间模式隐藏粒子画布 */
+html:not([data-theme="dark"]) #particles canvas {
+  display: none !important;
+}
+
+
+/* 粒子背景容器 */
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;background:linear-gradient(120deg, #f0f4ff, #f5f7ff, #eef2ff);}
+[data-theme="dark"] #particles{background:linear-gradient(120deg, #111422, #141826, #0d101d);}
+
+html,body{height:100%;overflow:hidden}
+body{background:transparent;color:var(--text-main);display:flex;justify-content:center;align-items:center;padding:10px;transition:all 0.3s cubic-bezier(0.25,1,0.5,1)}
+
+/* 主窗口 - 苹果圆角卡片 */
+.chat-wrapper{width:100%;max-width:720px;height:95vh;max-height:880px;background:var(--bg-white);border-radius:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1}
+
+/* 顶部导航 - 苹果毛玻璃风格 */
+.chat-header{padding:14px 20px;background:var(--bg-white);color:var(--text-main);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color)}
+.header-left{display:flex;align-items:center;gap:12px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--primary)}
+.header-title{font-weight:600;font-size:17px;letter-spacing:-0.02em}
+.header-btns{display:flex;gap:8px}
+.header-btn{background:transparent;border:1px solid var(--border-color);color:var(--text-secondary);padding:6px 12px;border-radius:20px;font-size:13px;cursor:pointer;transition:all 0.2s}
+.header-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+/* 聊天区域 */
+.chat-body{flex:1;padding:24px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;background:var(--bg-chat);scroll-behavior:smooth}
+.chat-body::-webkit-scrollbar{width:6px}
+.chat-body::-webkit-scrollbar-track{background:transparent}
+.chat-body::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:10px}
+
+/* 空状态 */
+.empty-state{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;color:var(--text-secondary)}
+.empty-avatar{width:70px;height:70px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:600}
+.empty-tips{text-align:center}
+.empty-tips h3{margin-bottom:8px;color:var(--text-main);font-weight:600}
+.quick-questions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:500px}
+.quick-btn{background:var(--bg-white);border:1px solid var(--border-color);color:var(--text-secondary);padding:10px 18px;border-radius:20px;font-size:14px;cursor:pointer;transition:all 0.2s}
+.quick-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+/* 消息气泡基础 */
+.msg {
+  max-width: 75%;
+  padding: 14px 18px;
+  border-radius: 20px;
+  line-height: 1.47;
+  font-size: 15px;
+  word-break: break-word;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 1;
+}
+.msg:hover {
+  transform: translateY(-1px);
+}
+
+/* 统一用户消息与AI消息样式 */
+.msg.user {
+  align-self: flex-end;
+  background: var(--bg-white) !important;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 20px;
+  box-shadow: var(--shadow-light);
+  position: relative;
+}
+/* 可选：给你自己的消息加一个小颜色标记，方便区分 */
+.msg.user::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+/* AI 消息 */
+.msg.ai {
+  align-self: flex-start;
+  background: var(--bg-white) !important;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-bottom-left-radius: 8px;
+  box-shadow: var(--shadow-light);
+}
+.msg.ai::before {
+  display: none !important;
+}
+
+/* 按钮默认隐藏，hover 显示 */
+.msg-actions {
+  display: flex !important;
+  gap: 8px;
+  opacity: 0;
+  margin-top: 8px;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.msg:hover .msg-actions {
+  opacity: 1;
+  pointer-events: all;
+}
+.msg.user .msg-actions {
+  align-self: flex-end;
+}
+
+/* 普通按钮（复制、重发） */
+.msg-action-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.9);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.msg-action-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* AI 消息按钮浅色 */
+.msg.ai .msg-action-btn {
+  background: rgba(0,0,0,0.04);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+.msg.ai .msg-action-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* 还原删除按钮：无小红圈，恢复简洁透明按钮 */
+.msg.user .msg-action-btn.danger {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.9);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.msg.user .msg-action-btn.danger:hover {
+  background: #ff3b30;
+  color: #fff;
+  border-color: #ff3b30;
+}
+
+/* 代码块 */
+.msg pre{background:var(--code-bg);border-radius:12px;margin:8px 0;overflow-x:auto}
+.msg code{font-family:Menlo,Monaco,Consolas;font-size:13px;padding:14px;display:block;color:#e5e5e5}
+.msg p{margin-bottom:8px}
+.msg p:last-child{margin-bottom:0}
+
+/* 加载动画 */
+.loading{padding:10px 16px;align-self:flex-start;display:flex;gap:5px}
+.loading-dot{width:8px;height:8px;border-radius:50%;background:var(--text-secondary);animation:dotJump 1.4s infinite ease-in-out both}
+.loading-dot:nth-child(1){animation-delay:-0.32s}
+.loading-dot:nth-child(2){animation-delay:-0.16s}
+@keyframes dotJump{
+    0%,80%,100%{transform:scale(0)}
+    40%{transform:scale(1)}
+}
+
+/* 输入框 */
+.input-bar{display:flex;padding:14px 16px;gap:12px;border-top:1px solid var(--border-color);background:var(--bg-white);align-items:flex-end}
+.input-wrapper{flex:1;position:relative}
+#input{width:100%;border:1px solid var(--border-color);border-radius:28px;padding:14px 20px;outline:none;font-size:15px;resize:none;line-height:1.47;max-height:120px;min-height:52px;background:var(--bg-main);color:var(--text-main);transition:border 0.2s}
+#input:focus{border-color:var(--primary)}
+#input::placeholder{color:var(--text-placeholder)}
+
+#sendBtn,#stopBtn{background:var(--primary);color:#fff;border:none;border-radius:26px;padding:0 22px;height:52px;font-weight:500;cursor:pointer;transition:background 0.2s;flex-shrink:0}
+#sendBtn:hover:not(:disabled){background:var(--primary-hover)}
+#sendBtn:disabled{opacity:.5}
+#stopBtn{background:var(--danger)}
+#stopBtn:hover{background:var(--danger-hover)}
+
+/* 弹窗 */
+.modal-mask{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg-mask);display:flex;justify-content:center;align-items:center;z-index:999}
+.modal-box{width:90%;max-width:420px;background:var(--bg-white);border-radius:20px;padding:26px;box-shadow:var(--shadow)}
+.modal-title{font-size:18px;font-weight:600;margin-bottom:14px;color:var(--text-main)}
+.modal-desc{color:var(--text-secondary);margin-bottom:20px;line-height:1.47}
+.modal-input{width:100%;border:1px solid var(--border-color);border-radius:14px;padding:14px 16px;outline:none;font-size:15px;margin-bottom:20px;background:var(--bg-main);color:var(--text-main)}
+.modal-input:focus{border-color:var(--primary)}
+.modal-btns{display:flex;gap:12px;justify-content:flex-end}
+.modal-btn{padding:10px 20px;border-radius:14px;border:none;cursor:pointer;font-size:14px;font-weight:500}
+.modal-btn.primary{background:var(--primary);color:#fff}
+.modal-btn.primary:hover{background:var(--primary-hover)}
+.modal-btn.secondary{background:var(--border-color);color:var(--text-main)}
+.modal-btn.secondary:hover{opacity:.8}
+
+/* 移动端 */
+@media (max-width:768px){
+    body{padding:0}
+    .chat-wrapper{max-width:100%;height:100vh;border-radius:0}
+    .msg{max-width:85%}
+    .msg-actions{opacity:1}
+}
+
+/* 快捷键面板（保持苹果风） */
+.shortcut-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;width:100%}
+.shortcut-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 12px;background:var(--bg-main);border:1px solid var(--border-color);border-radius:16px;color:var(--text-secondary);font-size:12px;cursor:pointer;transition:all 0.2s}
+.shortcut-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.shortcut-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+.shortcut-panel-toggle{position:fixed;top:16px;right:16px;z-index:9998}
+.shortcut-panel-mask{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg-mask);z-index:9999;display:none}
+.shortcut-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;max-width:480px;background:var(--bg-white);border-radius:20px;box-shadow:var(--shadow);padding:24px}
+.shortcut-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border-color)}
+.shortcut-panel-title{font-size:16px;font-weight:600;color:var(--text-main)}
+.shortcut-panel-close{cursor:pointer;font-size:20px;color:var(--text-secondary)}
+.shortcut-panel-list{display:flex;direction:column;gap:12px;max-height:60vh;overflow-y:auto}
+.shortcut-panel-item{display:flex;justify-content:space-between;align-items:center}
+.shortcut-item-desc{color:var(--text-main);font-size:14px}
+.shortcut-item-key{background:var(--bg-main);padding:4px 8px;border-radius:6px;font-size:12px;color:var(--text-secondary);border:1px solid var(--border-color)}
+.shortcut-panel-show{display:block}
+
+/* 移除旧背景动画，替换为粒子 */
+@keyframes bgGlow{}
+@keyframes bgGlowDark{}
+
+/* 聊天卡片外发光 + 悬浮弹跳 */
+.chat-wrapper {
+  position: relative;
+  box-shadow: 0 0 30px rgba(0, 113, 227, 0.08), 0 20px 60px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.chat-wrapper:hover {
+  transform: translateY(-4px) scale(1.005);
+  box-shadow: 0 0 40px rgba(0, 113, 227, 0.14), 0 25px 70px rgba(0,0,0,0.13);
+}
+[data-theme="dark"] .chat-wrapper {
+  box-shadow: 0 0 30px rgba(10,132,255,0.12), 0 20px 60px rgba(0,0,0,0.4);
+}
+
+/* 顶部标题小点缀 */
+.header-title::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 8px;
+  background: #34c759;
+  border-radius: 50%;
+  animation: onlineFlicker 2.5s ease-in-out infinite;
+}
+@keyframes onlineFlicker {
+  0%,100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* 消息气泡精致流光 */
+.msg.user {
+  background: linear-gradient(90deg, #0071e3, #0099ff);
+  background-size: 200% 200%;
+  animation: msgFlow 5s ease infinite;
+  position: relative;
+}
+@keyframes msgFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 消息悬浮效果 */
+.msg {
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  position: relative;
+}
+.msg:hover {
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* AI 消息淡入闪光 */
+.msg.ai {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  position: relative;
+}
+.msg.ai::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 20px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  background-size: 200% 100%;
+  animation: lightSweep 4s linear infinite;
+  pointer-events: none;
+  opacity: 0.3;
+}
+@keyframes lightSweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 按钮点击弹跳 */
+#sendBtn:active, .header-btn:active, .quick-btn:active {
+  transform: scale(0.94);
+}
+
+/* 输入框聚焦发光 */
+#input:focus {
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+}
+
+/* 滚动条美化 */
+.chat-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 113, 227, 0.2);
+  border-radius: 10px;
+}
+.chat-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 113, 227, 0.35);
+}
+
+/* 移动端适配样式 */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    padding: 0 10px;
+    overflow-x: hidden;
+  }
+
+  /* 让所有容器自适应屏幕 */
+  .container, .chat-container, .input-area {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 8px;
+  }
+
+  /* 按钮和输入框增大触摸区域 */
+  button, input, textarea {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  /* 防止图片/代码块溢出 */
+  img, pre, code {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+</style>
+</head>
+
+<body>
+<!-- 粒子背景 -->
+<div id="particles"></div>
+
+<div class="chat-wrapper">
+  <div class="chat-header">
+    <div class="header-left">
+      <div class="avatar">元</div>
+      <div class="header-title">小元</div>
+    </div>
+    <div class="header-btns">
+      <button class="header-btn" id="themeBtn">夜间模式</button>
+      <button class="header-btn" id="keyBtn">密钥</button>
+      <button class="header-btn" id="clearBtn">清空</button>
+    </div>
+  </div>
+
+  <div class="chat-body" id="chatBox">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-avatar">元</div>
+      <div class="empty-tips">
+        <h3>你好，我是小元</h3>
+        <p>有什么想和我说的，随时都在~</p>
+      </div>
+      <div class="quick-questions">
+        <button class="quick-btn" data-question="给我讲个冷笑话">讲个冷笑话</button>
+        <button class="quick-btn" data-question="帮我写个周末出游计划">出游计划</button>
+        <button class="quick-btn" data-question="解释一下什么是AI大模型">什么是大模型</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="input-wrapper">
+      <textarea id="input" placeholder="和小元说点什么吧..." rows="1"></textarea>
+      <div class="shortcut-bar">
+        <button class="shortcut-btn primary" id="shortcut-send">发送</button>
+        <button class="shortcut-btn" id="shortcut-newline">换行</button>
+        <button class="shortcut-btn" id="shortcut-clear-chat">清空</button>
+        <button class="shortcut-btn" id="shortcut-export-chat">导出</button>
+        <button class="shortcut-btn" id="shortcut-last-input">上一条</button>
+      </div>
+    </div>
+    <button id="sendBtn">发送</button>
+    <button id="stopBtn" style="display:none">停止</button>
+  </div>
+</div>
+
+<!-- 密钥弹窗 -->
+<div class="modal-mask" id="keyModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title">设置硅基流动API密钥</div>
+    <div class="modal-desc">密钥仅保存在本地，不会上传到任何服务器</div>
+    <input type="password" class="modal-input" id="keyInput" placeholder="sk-..." />
+    <div class="modal-btns">
+      <button class="modal-btn secondary" id="modalCancel">取消</button>
+      <button class="modal-btn primary" id="modalConfirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<button class="shortcut-btn shortcut-panel-toggle">快捷键</button>
+<div class="shortcut-panel-mask" id="shortcutPanelMask">
+  <div class="shortcut-panel">
+    <div class="shortcut-panel-header">
+      <h3 class="shortcut-panel-title">⌨️ 快捷操作</h3>
+      <span class="shortcut-panel-close" id="shortcutPanelClose">×</span>
+    </div>
+    <div class="shortcut-panel-list">
+      <div class="shortcut-panel-item"><span>发送消息</span><span class="shortcut-item-key">Enter</span><button class="shortcut-btn" id="panel-send">发送</button></div>
+      <div class="shortcut-panel-item"><span>换行</span><span class="shortcut-item-key">Shift+Enter</span><button class="shortcut-btn" id="panel-newline">换行</button></div>
+      <div class="shortcut-panel-item"><span>清空对话</span><span class="shortcut-item-key">Ctrl+L</span><button class="shortcut-btn" id="panel-clear-chat">清空</button></div>
+      <div class="shortcut-panel-item"><span>导出记录</span><span class="shortcut-item-key">Ctrl+S</span><button class="shortcut-btn" id="panel-export-chat">导出</button></div>
+      <div class="shortcut-panel-item"><span>上一条输入</span><span class="shortcut-item-key">↑</span><button class="shortcut-btn" id="panel-last-input">上一条</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================== 核心配置区 ==================
+const SYSTEM_PROMPT = '你是一位温柔、耐心、高情商的陪伴型助手。请始终遵循以下交流原则：1. 先共情，再回应，不评判、不指责、不说教。2. 语气温和柔软，像朋友一样自然亲切，不生硬、不冰冷。3. 认真倾听用户的情绪与困扰，给予理解与安慰，再给出理性、可执行的建议。4. 回答简洁有温度，不啰嗦、不敷衍。5. 尊重用户感受，不追问隐私。6. 当用户只是想倾诉时，安静陪伴即可；需要建议时再给出温和指引。7. 整体风格：治愈、包容、细腻、有安全感。'
+const MODEL_NAME = 'Qwen/Qwen2.5-7B-Instruct'
+const MAX_TOKEN_LIMIT = 8000
+const MAX_HISTORY_LENGTH = 15
+// ==================================================
+
+// ================== 彩色鼠标跟随粒子特效 ==================
+class Particle {
+  constructor(){
+    this.canvas=document.createElement("canvas");
+    this.ctx=this.canvas.getContext("2d");
+    this.w=window.innerWidth;
+    this.h=window.innerHeight;
+    this.canvas.style.cssText="position:fixed;top:0;left:0;z-index:-1";
+    document.getElementById("particles").appendChild(this.canvas);
+    this.particles=[];
+    this.mouse={x:this.w/2,y:this.h/2,radius:180};
+    this.colors = ["#0071e3","#34c759","#ff9500","#ff2d55","#5856d6"];
+    this.init();
+    this.bind();
+  }
+  init(){
+    this.canvas.width=this.w;
+    this.canvas.height=this.h;
+    this.particles=[];
+    let count=Math.floor(this.w*this.h/12000);
+    for(let i=0;i<count;i++){
+      this.particles.push({
+        x:Math.random()*this.w,
+        y:Math.random()*this.h,
+        vx:(Math.random()-0.5)*0.6,
+        vy:(Math.random()-0.5)*0.6,
+        radius:Math.random()*1.8+0.6,
+        color:this.colors[Math.floor(Math.random()*this.colors.length)]
+      })
+    }
+  }
+  bind(){
+    window.onresize=()=>{this.w=window.innerWidth;this.h=window.innerHeight;this.canvas.width=this.w;this.canvas.height=this.h;this.init()};
+    window.onmousemove=(e)=>{this.mouse.x=e.x;this.mouse.y=e.y};
+    window.onmouseout=()=>{this.mouse.x=this.w/2;this.mouse.y=this.h/2};
+  }
+  animate(){
+    requestAnimationFrame(()=>this.animate());
+    this.ctx.clearRect(0,0,this.w,this.h);
+    this.ctx.fillStyle = '#05081a';
+    this.ctx.fillRect(0, 0, this.w, this.h);
+    for(let i=0;i<this.particles.length;i++){
+      let p=this.particles[i];
+      p.x+=p.vx;
+      p.y+=p.vy;
+      p.x<0&&(p.x=this.w);p.x>this.w&&(p.x=0);
+      p.y<0&&(p.y=this.h);p.y>this.h&&(p.y=0);
+      
+      let dx=this.mouse.x-p.x;
+      let dy=this.mouse.y-p.y;
+      let dist=Math.sqrt(dx*dx+dy*dy);
+      
+      if(dist<this.mouse.radius){
+        let force=(this.mouse.radius-dist)/this.mouse.radius;
+        p.x-=dx*force*0.08;
+        p.y-=dy*force*0.08;
+      }
+      
+      this.ctx.beginPath();
+      this.ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+      this.ctx.fillStyle=p.color;
+      this.ctx.globalAlpha=0.75;
+      this.ctx.fill();
+      
+      for(let j=i+1;j<this.particles.length;j++){
+        let p2=this.particles[j];
+        let dx=p.x-p2.x,dy=p.y-p2.y;
+        let dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<130){
+          this.ctx.beginPath();
+          this.ctx.strokeStyle=p.color;
+          this.ctx.globalAlpha=0.25*(1-dist/130);
+          this.ctx.lineWidth=0.5;
+          this.ctx.moveTo(p.x,p.y);
+          this.ctx.lineTo(p2.x,p2.y);
+          this.ctx.stroke();
+        }
+      }
+    }
+  }
+}
+setTimeout(()=>{new Particle().animate()},100);
+// ==========================================================
+
+
+const chatBox = document.getElementById('chatBox')
+const input = document.getElementById('input')
+const sendBtn = document.getElementById('sendBtn')
+const stopBtn = document.getElementById('stopBtn')
+const clearBtn = document.getElementById('clearBtn')
+const themeBtn = document.getElementById('themeBtn')
+const keyBtn = document.getElementById('keyBtn')
+const emptyState = document.getElementById('emptyState')
+const keyModal = document.getElementById('keyModal')
+const keyInput = document.getElementById('keyInput')
+const modalConfirm = document.getElementById('modalConfirm')
+const modalCancel = document.getElementById('modalCancel')
+const quickBtns = document.querySelectorAll('.quick-btn')
+
+const STORAGE_KEY = 'wensi-chat-data'
+let abortController = null
+let lastSendText = ''
+let isGenerating = false
+
+function htmlEscape(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+function parseMarkdown(text){let e=htmlEscape(text);e=e.replace(/```([\s\S]*?)```/g,(t,e)=>`<pre><code class="hljs">${e}</code></pre>`);return e=e.replace(/\n/g,"<br>")}
+function estimateToken(t){const e=(t.match(/[\u4e00-\u9fa5]/g)||[]).length,r=(t.match(/[a-zA-Z]+/g)||[]).length;return 2*e+r}
+function scrollToBottom(){
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// 页面加载后平滑定位到最新消息（不回弹、不跳动）
+function keepAtLatestMessage() {
+  setTimeout(() => {
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }, 0);
+}
+function toggleEmptyState(){const t=chatBox.querySelectorAll(".msg").length>0;emptyState.style.display=t?"none":"flex"}
+function saveKey(t){localStorage.setItem("wensi-api-key",btoa(t))}
+function getKey(){const t=localStorage.getItem("wensi-api-key");return t?atob(t):""}
+async function validateKey(t){if(!t||!t.startsWith("sk-"))return false;try{const e=await fetch("https://api.siliconflow.cn/v1/models",{method:"GET",headers:{Authorization:`Bearer ${t}`}});return e.ok}catch{return false}}
+function openKeyModal(){keyInput.value=getKey(),keyModal.style.display="flex",keyInput.focus()}
+function closeKeyModal(){keyModal.style.display="none"}
+function saveHistory(t){localStorage.setItem(STORAGE_KEY,JSON.stringify(t))}
+function loadHistory(){const t=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");0===t.length||(t.forEach(e=>{addMsg(e.content,"user"===e.role,!1)}),toggleEmptyState(),scrollToBottom())}
+function buildContext(t){let e=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"),r=[{role:"system",content:SYSTEM_PROMPT},...e,{role:"user",content:t}];let a=r.reduce((t,e)=>t+estimateToken(e.content),0);for(;a>MAX_TOKEN_LIMIT&&r.length>2;){const t=r.splice(1,2);a-=t.reduce((t,e)=>t+estimateToken(e.content),0)}return r.length>2*MAX_HISTORY_LENGTH+1&&(r=[r[0],...r.slice(-2*MAX_HISTORY_LENGTH)]),r}
+function deleteMessage(t){confirm("确定删除这条消息吗？")&&((t=t.closest(".msg")).remove(),saveHistory(JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]").splice(Array.from(chatBox.querySelectorAll(".msg")).indexOf(t),1)),toggleEmptyState())}
+
+function addMsg(t,e,r=true){const a=document.createElement("div");a.className=e?"msg user":"msg ai",a.innerHTML=parseMarkdown(t);const o=document.createElement("div");o.className="msg-actions";const i=document.createElement("button");i.className="msg-action-btn",i.textContent="复制",i.onclick=()=>{navigator.clipboard.writeText(t).then(()=>{i.textContent="已复制",setTimeout(()=>i.textContent="复制",2e3)})},o.appendChild(i);if(e){const e=document.createElement("button");e.className="msg-action-btn",e.textContent="重发",e.onclick=()=>{input.value=t,send()},o.appendChild(e)}else{const e=document.createElement("button");e.className="msg-action-btn",e.textContent="重新生成",e.onclick=()=>{const t=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]").findLast(t=>"user"===t.role);t&&(chatBox.querySelectorAll(".msg").length>=2&&(chatBox.removeChild(chatBox.querySelectorAll(".msg")[chatBox.querySelectorAll(".msg").length-1]),chatBox.removeChild(chatBox.querySelectorAll(".msg")[chatBox.querySelectorAll(".msg").length-1])),input.value=t.content,send())},o.appendChild(e)}const s=document.createElement("button");s.className="msg-action-btn danger",s.textContent="删除",s.onclick=()=>deleteMessage(s),o.appendChild(s),a.appendChild(o),chatBox.appendChild(a),window.hljs&&hljs.highlightAll(),toggleEmptyState(),scrollToBottom(),r&&saveHistory([...JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"),{role:e?"user":"assistant",content:t}])}
+
+function updateAiMsg(t,e){t.innerHTML=parseMarkdown(e),window.hljs&&hljs.highlightAll(),scrollToBottom()}
+function stopGenerate(){abortController&&(abortController.abort(),abortController=null),isGenerating=!1,sendBtn.style.display="block",stopBtn.style.display="none"}
+
+async function send(){const t=input.value.trim();if(!t||isGenerating)return;const e=getKey();if(!e)return openKeyModal(),void 0;lastSendText=t,input.value="",input.style.height="52px",isGenerating=!0,sendBtn.style.display="none",stopBtn.style.display="block",addMsg(t,!0);const r=document.createElement("div");r.className="loading",r.innerHTML=`<div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div>`,chatBox.appendChild(r),scrollToBottom(),abortController=new AbortController;try{const a=buildContext(t),o=await fetch("https://api.siliconflow.cn/v1/chat/completions",{method:"POST",signal:abortController.signal,headers:{"Content-Type":"application/json",Authorization:`Bearer ${e}`},body:JSON.stringify({model:MODEL_NAME,temperature:.7,messages:a,stream:!0,frequency_penalty:.2})});if(chatBox.removeChild(r),!o.ok){const t=await o.json().catch(()=>({})),e="请求失败，请检查网络后重试";switch(o.status){case 401:t="密钥无效，请检查API密钥",openKeyModal();break;case 404:t="模型不存在";break;case 429:t="请求频繁或额度不足";break;case 500:t="服务端异常"}return addMsg(t,!1),void stopGenerate()}const i=o.body.getReader(),s=new TextDecoder("utf-8");let l="";const d=document.createElement("div");d.className="msg ai",chatBox.appendChild(d);for(;;){const{done:t,value:e}=await i.read();if(t)break;const r=s.decode(e),a=r.split("\n").filter(t=>t.trim()!=="");for(const t of a)if(t.startsWith("data: ")){const e=t.slice(6).trim();if("[DONE]"===e)continue;try{const t=JSON.parse(e),r=t.choices?.[0]?.delta?.content||"";r&&(l+=r,updateAiMsg(d,l))}catch{}}}const c=document.createElement("div");c.className="msg-actions";const n=document.createElement("button");n.className="msg-action-btn",n.textContent="复制",n.onclick=()=>{navigator.clipboard.writeText(l).then(()=>{n.textContent="已复制",setTimeout(()=>n.textContent="复制",2e3)})};const u=document.createElement("button");u.className="msg-action-btn",u.textContent="重新生成",u.onclick=()=>{chatBox.querySelectorAll(".msg").length>=2&&(chatBox.removeChild(chatBox.querySelectorAll(".msg")[chatBox.querySelectorAll(".msg").length-1]),chatBox.removeChild(chatBox.querySelectorAll(".msg")[chatBox.querySelectorAll(".msg").length-1])),input.value=t,send()};const p=document.createElement("button");p.className="msg-action-btn danger",p.textContent="删除",p.onclick=()=>deleteMessage(p),c.appendChild(n),c.appendChild(u),c.appendChild(p),d.appendChild(c),saveHistory([...JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"),{role:"assistant",content:l}])}catch(t){t.name!=="AbortError"&&(console.error("请求异常：",t),chatBox.contains(r)&&chatBox.removeChild(r),addMsg("网络连接失败",!1))}finally{stopGenerate()}}
+
+function toggleTheme(){const t="dark"===document.documentElement.getAttribute("data-theme");t?(document.documentElement.removeAttribute("data-theme"),themeBtn.textContent="夜间模式",localStorage.setItem("wensi-theme","light")):(document.documentElement.setAttribute("data-theme","dark"),themeBtn.textContent="日间模式",localStorage.setItem("wensi-theme","dark"))}
+function loadTheme(){"dark"===localStorage.getItem("wensi-theme")&&(document.documentElement.setAttribute("data-theme","dark"),themeBtn.textContent="日间模式")}
+
+window.onload=()=>{
+  loadTheme();
+  loadHistory();
+  keepAtLatestMessage(); // 加这一句
+  input.focus();
+  getKey()||openKeyModal();
+  initShortcutHistory();
+}
+sendBtn.addEventListener("click",send),stopBtn.addEventListener("click",stopGenerate),clearBtn.addEventListener("click",()=>{confirm("确定清空所有对话？")&&(chatBox.innerHTML="",chatBox.appendChild(emptyState),localStorage.removeItem(STORAGE_KEY),toggleEmptyState(),input.focus(),inputHistory.length=0,historyIndex=-1)}),themeBtn.addEventListener("click",toggleTheme),keyBtn.addEventListener("click",openKeyModal),modalConfirm.addEventListener("click",async()=>{const t=keyInput.value.trim();if(!t)return void alert("请输入密钥");const e=await validateKey(t);e?(saveKey(t),closeKeyModal(),input.focus()):alert("密钥无效")}),modalCancel.addEventListener("click",closeKeyModal),quickBtns.forEach(t=>{t.addEventListener("click",()=>{input.value=t.dataset.question,send()})}),input.addEventListener("input",()=>{input.style.height="auto",input.style.height=Math.min(input.scrollHeight,120)+"px"});
+
+const shortcutPanelMask=document.getElementById("shortcutPanelMask"),shortcutPanelClose=document.getElementById("shortcutPanelClose");
+const inputHistory=[],history=[];let historyIndex=-1;
+function initShortcutHistory(){JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]").forEach(t=>{"user"===t.role&&inputHistory.push(t.content)})}
+document.getElementById("shortcut-send").addEventListener("click",send);
+document.getElementById("shortcut-newline").addEventListener("click",()=>{input.value+="\n",input.focus(),input.style.height="auto",input.style.height=Math.min(input.scrollHeight,120)+"px"});
+document.getElementById("shortcut-clear-chat").addEventListener("click",()=>clearBtn.click());
+document.getElementById("shortcut-export-chat").addEventListener("click",()=>{const t=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");if(0===t.length)return void alert("暂无记录");let e="# 小元对话记录\n\n导出时间："+(new Date).toLocaleString()+"\n\n---\n\n";t.forEach((t,r)=>{const a="user"===t.role?"用户":"小元";e+=`## ${a}\n${t.content}\n\n`});const r=new Blob([e],{type:"text/markdown"}),a=URL.createObjectURL(r),o=document.createElement("a");o.href=a,o.download="小元对话_"+(new Date).toLocaleString().replace(/[/:\s]/g,"-")+".md",o.click(),URL.revokeObjectURL(a)});
+document.getElementById("shortcut-last-input").addEventListener("click",()=>{0!==inputHistory.length&&(historyIndex=-1===historyIndex?inputHistory.length-1:Math.max(historyIndex-1,0),input.value=inputHistory[historyIndex],input.focus(),input.style.height="auto",input.style.height=Math.min(input.scrollHeight,120)+"px")});
+document.querySelector(".shortcut-panel-toggle").addEventListener("click",()=>{shortcutPanelMask.classList.add("shortcut-panel-show")});
+shortcutPanelClose.addEventListener("click",()=>{shortcutPanelMask.classList.remove("shortcut-panel-show")});
+shortcutPanelMask.addEventListener("click",t=>{t.target===shortcutPanelMask&&shortcutPanelMask.classList.remove("shortcut-panel-show")});
+document.addEventListener("keydown",t=>{"F1"===t.key&&(t.preventDefault(),shortcutPanelMask.classList.toggle("shortcut-panel-show"))});
+document.getElementById("panel-send").addEventListener("click",send);
+document.getElementById("panel-newline").addEventListener("click",()=>document.getElementById("shortcut-newline").click());
+document.getElementById("panel-clear-chat").addEventListener("click",()=>clearBtn.click());
+document.getElementById("panel-export-chat").addEventListener("click",()=>document.getElementById("shortcut-export-chat").click());
+document.getElementById("panel-last-input").addEventListener("click",()=>document.getElementById("shortcut-last-input").click());
+
+input.addEventListener("keydown",t=>{"Enter"===t.key&&!t.shiftKey&&(t.preventDefault(),send())});
+input.addEventListener("keydown",t=>{"Enter"===t.key&&!t.shiftKey&&input.value.trim()&&(inputHistory[inputHistory.length-1]!==input.value.trim()&&inputHistory.push(input.value.trim()),historyIndex=-1);if("ArrowUp"===t.key&&0!==inputHistory.length)return t.preventDefault(),void(historyIndex=-1===historyIndex?inputHistory.length-1:Math.max(historyIndex-1,0),input.value=inputHistory[historyIndex],input.style.height="auto",input.style.height=Math.min(input.scrollHeight,120)+"px");if("ArrowDown"===t.key&&0!==inputHistory.length){t.preventDefault();let e;-1===historyIndex||historyIndex>=inputHistory.length-1?(e=-1,input.value=""):(e=Math.min(historyIndex+1,inputHistory.length-1),input.value=inputHistory[e]),historyIndex=e,input.style.height="auto",input.style.height=Math.min(input.scrollHeight,120)+"px"}});
+
+document.addEventListener("keydown",t=>{t.ctrlKey&&"l"===t.key.toLowerCase()&&(t.preventDefault(),clearBtn.click());t.ctrlKey&&"s"===t.key.toLowerCase()&&(t.preventDefault(),document.getElementById("shortcut-export-chat").click())});
+</script>
+</body>
+</html>
